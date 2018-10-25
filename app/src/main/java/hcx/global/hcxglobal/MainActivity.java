@@ -3,6 +3,7 @@ package hcx.global.hcxglobal;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -20,15 +21,20 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import pl.droidsonroids.gif.GifImageView;
+
 
 public class MainActivity extends AppCompatActivity {
     private Context mContext;
     private Activity mActivity;
 
     private RelativeLayout mRelativeLayout;
+    private GifImageView gifImageView;
     private WebView mWebView;
     private ProgressBar mProgressBar;
-
+    SharedPreferences sharedpreferences;
+    public static final String mypreference = "lastURLPref";
+    public static String lastVisitedURL = "https://hcx.global";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +44,8 @@ public class MainActivity extends AppCompatActivity {
         mContext = getApplicationContext();
         mActivity = MainActivity.this;
         mRelativeLayout = (RelativeLayout) findViewById(R.id.rl);
+        gifImageView = (GifImageView) findViewById(R.id.loadergifIV);
+
         mWebView = (WebView) findViewById(R.id.web_view);
         CookieManager.getInstance().setAcceptThirdPartyCookies(mWebView,true);
         mWebView.getSettings().setLoadsImagesAutomatically(true);
@@ -45,9 +53,21 @@ public class MainActivity extends AppCompatActivity {
         mWebView.getSettings().setUserAgentString("Chrome/58.0.0.0 Mobile");
         mWebView.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
         mWebView.getSettings().setDomStorageEnabled(true);
+        mWebView.getSettings().setSupportZoom(true);
+        mWebView.getSettings().setBuiltInZoomControls(true);
+        mWebView.setVisibility(View.GONE);
+        mWebView.setPadding(0, 0, 0, 0);
+        mWebView.getSettings().setLoadWithOverviewMode(true);
+        mWebView.getSettings().setUseWideViewPort(true);
         mWebView.getSettings().setAllowUniversalAccessFromFileURLs(true);
         mProgressBar = (ProgressBar) findViewById(R.id.pb);
-        renderWebPage("https://hcx.global");
+
+        sharedpreferences = getSharedPreferences(mypreference, Context.MODE_PRIVATE);
+        if (sharedpreferences.contains("lastURLKey")) {
+            lastVisitedURL = sharedpreferences.getString("lastURLKey", "https://hcx.global");
+        }
+
+        renderWebPage(lastVisitedURL);
     }
 
     protected void renderWebPage(String urlToRender){
@@ -60,7 +80,11 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onPageFinished(WebView view, String url){
                 // Do something when page loading finished
-                //Toast.makeText(mContext,"Page Loaded.",Toast.LENGTH_SHORT).show();
+                SharedPreferences.Editor editor = sharedpreferences.edit();
+                editor.putString("lastURLKey", url);
+                editor.commit();
+                mWebView.setVisibility(View.VISIBLE);
+                //Toast.makeText(mContext,url,Toast.LENGTH_LONG).show();
             }
 
         });
@@ -70,6 +94,7 @@ public class MainActivity extends AppCompatActivity {
                 mProgressBar.setProgress(newProgress);
                 if(newProgress == 100){
                     mProgressBar.setVisibility(View.GONE);
+                    gifImageView.setVisibility(View.GONE);
                 }
             }
         });

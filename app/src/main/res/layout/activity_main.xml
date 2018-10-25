@@ -7,8 +7,9 @@
     android:layout_height="match_parent"
     android:padding="10dp"
     tools:context=".MainActivity"
-    android:background="#fcfdfb"
+
     >
+
     <ProgressBar
         android:id="@+id/pb"
         android:layout_width="match_parent"
@@ -16,6 +17,15 @@
         android:progressDrawable="@drawable/progressbar_states"
         style="@style/Widget.AppCompat.ProgressBar.Horizontal"
         android:visibility="gone"
+        />
+
+    <pl.droidsonroids.gif.GifImageView
+        android:id="@+id/loadergifIV"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/loader"
         />
 
     <WebView
